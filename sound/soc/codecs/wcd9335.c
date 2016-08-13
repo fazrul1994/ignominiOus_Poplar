@@ -13605,6 +13605,7 @@ static struct regulator *tasha_codec_find_ondemand_regulator(
 }
 
 #ifdef CONFIG_SOUND_CONTROL
+
 static struct snd_soc_codec *sound_control_codec_ptr;
 
 static ssize_t mic_gain_show(struct kobject *kobj,
@@ -13653,6 +13654,36 @@ static ssize_t earpiece_gain_store(struct kobject *kobj,
 
 	snd_soc_write(sound_control_codec_ptr, WCD9335_CDC_RX0_RX_VOL_CTL, input);
 
+struct snd_soc_codec *sound_control_codec_ptr;
+
+static ssize_t headphone_gain_show(struct kobject *kobj,
+		struct kobj_attribute *attr, char *buf)
+{
+	return snprintf(buf, PAGE_SIZE, "%d %d\n",
+		snd_soc_read(sound_control_codec_ptr, WCD9335_CDC_RX1_RX_VOL_CTL),
+		snd_soc_read(sound_control_codec_ptr, WCD9335_CDC_RX2_RX_VOL_CTL)
+	);
+}
+
+static ssize_t headphone_gain_store(struct kobject *kobj,
+		struct kobj_attribute *attr, const char *buf, size_t count)
+{
+
+	int input_l, input_r;
+
+	sscanf(buf, "%d %d", &input_l, &input_r);
+
+	if (input_l < -10 || input_l > 20)
+		input_l = 0;
+
+	if (input_r < -10 || input_r > 20)
+		input_r = 0;
+
+	snd_soc_write(sound_control_codec_ptr, WCD9335_CDC_RX1_RX_VOL_MIX_CTL, input_l);
+	snd_soc_write(sound_control_codec_ptr, WCD9335_CDC_RX2_RX_VOL_MIX_CTL, input_r);
+	snd_soc_write(sound_control_codec_ptr, WCD9335_CDC_RX1_RX_VOL_CTL, input_l);
+	snd_soc_write(sound_control_codec_ptr, WCD9335_CDC_RX2_RX_VOL_CTL, input_r);
+
 	return count;
 }
 
@@ -13664,6 +13695,14 @@ static struct kobj_attribute earpiece_gain_attribute =
 static struct attribute *sound_control_attrs[] = {
 		&mic_gain_attribute.attr,
 		&earpiece_gain_attribute.attr,
+
+static struct kobj_attribute headphone_gain_attribute =
+	__ATTR(headphone_gain, 0664,
+		headphone_gain_show,
+		headphone_gain_store);
+
+static struct attribute *sound_control_attrs[] = {
+		&headphone_gain_attribute.attr,
 		NULL,
 };
 
@@ -13684,6 +13723,9 @@ static int tasha_codec_probe(struct snd_soc_codec *codec)
 	void *ptr = NULL;
 	struct regulator *supply;
 
+#ifdef CONFIG_SOUND_CONTROL
+	sound_control_codec_ptr = codec;
+#endif
 	control = dev_get_drvdata(codec->dev->parent);
 
 	dev_info(codec->dev, "%s()\n", __func__);
@@ -14485,6 +14527,18 @@ static int tasha_probe(struct platform_device *pdev)
 	tasha_update_reg_defaults(tasha);
 	schedule_work(&tasha->tasha_add_child_devices_work);
 	tasha_get_codec_ver(tasha);
+
+#ifdef CONFIG_SOUND_CONTROL
+	sound_control_kobj = kobject_create_and_add("sound_control", kernel_kobj);
+	if (sound_control_kobj == NULL) {
+		pr_warn("%s kobject create failed!\n", __func__);
+        }
+
+	ret = sysfs_create_group(sound_control_kobj, &sound_control_attr_group);
+        if (ret) {
+		pr_warn("%s sysfs file create failed!\n", __func__);
+	}
+#endif
 
 	dev_info(&pdev->dev, "%s: Tasha driver probe done\n", __func__);
 	return ret;
