@@ -80,9 +80,32 @@ obj-$(CONFIG_RAMDUMP_MEMDESC) += ramdump_mem_desc.o
 obj-$(CONFIG_POWERKEY_FORCECRASH) += powerkey_forcecrash.o
 obj-$(CONFIG_MMTUNER_MN8855x) += mm_tuner/
 obj-$(CONFIG_ONESEG_TUNER_SMTVJ19X) += oneseg_tuner_drv.o
+obj-$(CONFIG_UID_SYS_STATS)	+= uid_sys_stats.o
+obj-$(CONFIG_MCU_IPC)           += mcu_ipc/
+obj-$(CONFIG_SEC_SIPC_MODEM_IF) += modem_v1/
+obj-$(CONFIG_SEC_MODEM_IF) 	+= modem_if/
+obj-$(CONFIG_MEMORY_STATE_TIME)	+= memory_state_time.o
+obj-$(CONFIG_BATTERY_SAVER)	+= battery_saver.o
 
-# TODO: remove me b/62058353
-subdir-ccflags-y += \
-	-Wno-enum-conversion \
-	-Wno-ignored-attributes \
-	-Wno-header-guard
+lkdtm-$(CONFIG_LKDTM)		+= lkdtm_core.o
+lkdtm-$(CONFIG_LKDTM)		+= lkdtm_bugs.o
+lkdtm-$(CONFIG_LKDTM)		+= lkdtm_heap.o
+lkdtm-$(CONFIG_LKDTM)		+= lkdtm_perms.o
+lkdtm-$(CONFIG_LKDTM)		+= lkdtm_rodata_objcopy.o
+lkdtm-$(CONFIG_LKDTM)		+= lkdtm_usercopy.o
+
+CFLAGS_lkdtm_rodata.o		+= $(DISABLE_LTO)
+KCOV_INSTRUMENT_lkdtm_rodata.o	:= n
+
+# Gaming mode
+obj-$(CONFIG_GAMING_CONTROL)		+= gaming_control.o
+
+obj-$(CONFIG_TIMA_LOG)		+= tima_debug_log.o
+
+OBJCOPYFLAGS :=
+OBJCOPYFLAGS_lkdtm_rodata_objcopy.o := \
+			--set-section-flags .text=alloc,readonly \
+			--rename-section .text=.rodata
+targets += lkdtm_rodata.o lkdtm_rodata_objcopy.o
+$(obj)/lkdtm_rodata_objcopy.o: $(obj)/lkdtm_rodata.o FORCE
+	$(call if_changed,objcopy)
