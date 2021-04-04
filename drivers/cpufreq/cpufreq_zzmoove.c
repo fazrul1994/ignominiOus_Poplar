@@ -36,7 +36,6 @@
 
 #include <linux/cpu.h>
 #ifdef USE_LCD_NOTIFIER
-#include <linux/lcd_notify.h>
 #endif /* USE_LCD_NOTIFIER */
 #include <linux/cpufreq.h>
 #if defined(CONFIG_HAS_EARLYSUSPEND) && !defined(DISABLE_POWER_MANAGEMENT)
@@ -9032,7 +9031,7 @@ static int zzmoove_lcd_notifier_callback(struct notifier_block *this,
 {
 	switch (event)
 	{
-		case LCD_EVENT_OFF_END:
+		case 'LCD_EVENT_OFF_END':
 
 			if (!suspend_flag)
 			    zzmoove_suspend();
@@ -9041,7 +9040,7 @@ static int zzmoove_lcd_notifier_callback(struct notifier_block *this,
 #endif /* ZZMOOVE_DEBUG */
 			break;
 
-		case LCD_EVENT_ON_START:
+		case 'LCD_EVENT_ON_START':
 
 			if (suspend_flag)
 			    zzmoove_resume();
