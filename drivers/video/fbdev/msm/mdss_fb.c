@@ -3791,6 +3791,10 @@ int mdss_fb_atomic_commit(struct fb_info *info,
 		goto end;
 	}
 
+#ifdef CONFIG_DYNAMIC_STUNE
+	dynstune_acquire_update(CORE);
+#endif
+
 	commit_v1 = &commit->commit_v1;
 	if (commit_v1->flags & MDP_VALIDATE_LAYER) {
 		ret = mdss_fb_wait_for_kickoff(mfd);

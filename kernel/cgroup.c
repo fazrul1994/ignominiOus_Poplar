@@ -2774,6 +2774,12 @@ static ssize_t __cgroup_procs_write(struct kernfs_open_file *of, char *buf,
 	if (!ret)
 		ret = cgroup_attach_task(cgrp, tsk, threadgroup);
 
+#ifdef CONFIG_DYNAMIC_STUNE
+	if (!ret && !threadgroup && !strcmp(of->kn->parent->name, "top-app") &&
+	    	task_is_zygote(tsk->parent))
+		dynstune_acquire_update(CORE);
+#endif
+
 	put_task_struct(tsk);
 	goto out_unlock_threadgroup;
 
