@@ -81,9 +81,9 @@ static int usb_switch_enable;
 static int lsm_port_index;
 static int slim0_rx_aanc_fb_port;
 static int msm_route_ec_ref_rx;
-static int msm_ec_ref_ch = 4;
-static int msm_ec_ref_bit_format = SNDRV_PCM_FORMAT_S16_LE;
-static int msm_ec_ref_sampling_rate = 48000;
+static int msm_ec_ref_ch = 32;
+static int msm_ec_ref_bit_format = 0;
+static int msm_ec_ref_sampling_rate = 0;
 static uint32_t voc_session_id = ALL_SESSION_VSID;
 static int msm_route_ext_ec_ref;
 static bool is_custom_stereo_on;
@@ -97,6 +97,8 @@ static struct mute_params {
 	uint32_t flag_ch1;
 	uint32_t flag_ch2;
 } mute = {0, 0, 0};
+
+static int msm_native_mode = 1;
 
 #define WEIGHT_0_DB 0x4000
 /* all the FEs which can support channel mixer */
@@ -3652,6 +3654,7 @@ static int msm_native_mode_put(struct snd_kcontrol *kcontrol,
 	 * 2 << 11: use channel native mode
 	 * 3 << 11: use bit width and channel native mode
 	*/
+	/*
 	switch (ucontrol->value.integer.value[0]) {
 	case 3:
 	case 2:
@@ -3666,6 +3669,7 @@ static int msm_native_mode_put(struct snd_kcontrol *kcontrol,
 	pr_debug("%s: msm_native_mode = %d ucontrol value %ld\n",
 		__func__, msm_native_mode,
 		ucontrol->value.integer.value[0]);
+	*/
 	adm_set_native_mode(msm_native_mode);
 	return 0;
 }
@@ -3694,8 +3698,10 @@ static int msm_ec_ref_ch_get(struct snd_kcontrol *kcontrol,
 static int msm_ec_ref_ch_put(struct snd_kcontrol *kcontrol,
 			       struct snd_ctl_elem_value *ucontrol)
 {
+	/*
 	msm_ec_ref_ch = ucontrol->value.integer.value[0];
 	pr_debug("%s: msm_ec_ref_ch = %d\n", __func__, msm_ec_ref_ch);
+	*/
 	adm_num_ec_ref_rx_chans(msm_ec_ref_ch);
 	return 0;
 }
@@ -3726,7 +3732,7 @@ static int msm_ec_ref_bit_format_put(struct snd_kcontrol *kcontrol,
 			       struct snd_ctl_elem_value *ucontrol)
 {
 	u16 bit_width = 0;
-
+	/*
 	switch (ucontrol->value.integer.value[0]) {
 	case 2:
 		msm_ec_ref_bit_format = SNDRV_PCM_FORMAT_S24_LE;
@@ -3746,6 +3752,7 @@ static int msm_ec_ref_bit_format_put(struct snd_kcontrol *kcontrol,
 
 	pr_debug("%s: msm_ec_ref_bit_format = %d\n",
 		 __func__, msm_ec_ref_bit_format);
+	*/
 	adm_ec_ref_rx_bit_width(bit_width);
 	return 0;
 }
@@ -3764,6 +3771,7 @@ static int msm_ec_ref_rate_get(struct snd_kcontrol *kcontrol,
 static int msm_ec_ref_rate_put(struct snd_kcontrol *kcontrol,
 				      struct snd_ctl_elem_value *ucontrol)
 {
+	/*
 	switch (ucontrol->value.integer.value[0]) {
 	case 0:
 		msm_ec_ref_sampling_rate = 0;
@@ -3798,6 +3806,7 @@ static int msm_ec_ref_rate_put(struct snd_kcontrol *kcontrol,
 	}
 	pr_debug("%s: msm_ec_ref_sampling_rate = %d\n",
 		 __func__, msm_ec_ref_sampling_rate);
+	*/
 	adm_ec_ref_rx_sampling_rate(msm_ec_ref_sampling_rate);
 	return 0;
 }
