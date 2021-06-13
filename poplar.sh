@@ -21,7 +21,7 @@
     export CROSS_COMPILE_ARM32="ccache arm-linux-   gnueabi-"
     export CLANG_PATH=/root/pacman-clang
     
-    time make lineage-msm8998-yoshino-poplar_kddi_defconfig O=out
+    time make ignominiOus-poplaR_defconfig O=out
     time make menuconfig O=out
     
     figlet tinggal tunggu sambil ngopi | lolcat
