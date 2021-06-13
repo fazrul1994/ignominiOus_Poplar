@@ -3,7 +3,7 @@
 	BUILD_START=$(date +"%s")
 	
 	neofetch
-	echo Reload Compiler pacman-clang Tool
+	echo Reload Compiler pacman-clang Tool | lolcat
 	echo by fazrul Not Dev.... | lolcat
 	toilet Are you Ready...???? | lolcat
 	
@@ -41,7 +41,7 @@ BUILD_END=$(date +"%s")
 DIFF=$(($BUILD_END - $BUILD_START))
 
 echo -e ""
-figlet ignominiOus kernel compile done
+figlet ignominiOus kernel compile done | lolcat
 echo -e ""
 echo -e "\033[0;32mBuild completed in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
 	
