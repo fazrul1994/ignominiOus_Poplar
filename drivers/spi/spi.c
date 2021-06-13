@@ -1846,7 +1846,7 @@ struct spi_master *__spi_alloc_controller(struct device *dev,
 	device_initialize(&master->dev);
 	master->bus_num = -1;
 	master->num_chipselect = 1;
-	master->slave = slave;
+	master;
 	if (IS_ENABLED(CONFIG_SPI_SLAVE) && slave)
 		master->dev.class = &spi_slave_class;
 	else

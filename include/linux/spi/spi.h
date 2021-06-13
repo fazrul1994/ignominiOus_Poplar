@@ -564,7 +564,7 @@ static inline void spi_master_put(struct spi_master *master)
 
 static inline bool spi_controller_is_slave(struct spi_master *ctlr)
 {
-	return IS_ENABLED(CONFIG_SPI_SLAVE) && ctlr->slave;
+	return IS_ENABLED(CONFIG_SPI_SLAVE) && ctlr;
 }
 
 /* PM calls that need to be issued by the driver */

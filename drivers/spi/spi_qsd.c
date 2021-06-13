@@ -2705,7 +2705,7 @@ static int msm_spi_probe(struct platform_device *pdev)
 			goto err_probe_res;
 		}
 
-		master->slave		= true;
+		master;
 		master->set_cs		= NULL;
 		master->setup		= NULL;
 		master->slave_abort	= msm_spi_slv_abort;
