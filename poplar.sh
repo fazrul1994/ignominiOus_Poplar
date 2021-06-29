@@ -18,7 +18,7 @@
     export PATH="/usr/lib/ccache:$PATH"
     export USE_CCACHE=1
     export CROSS_COMPILE="ccache aarch64-linux-gnu-"
-    export CROSS_COMPILE_ARM32="ccache arm-linux-   gnueabi-"
+    export CROSS_COMPILE_ARM32="ccache arm-linux-gnueabi-"
     export CLANG_PATH=/root/pacman-clang
     
     time make ignominiOus-poplaR_defconfig O=out
