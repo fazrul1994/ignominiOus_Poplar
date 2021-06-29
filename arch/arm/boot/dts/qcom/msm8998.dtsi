@@ -53,6 +53,7 @@
 			qcom,limits-info = <&mitigation_profile0>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			enable-method = "psci";
+			#cooling-cells = <2>;
 			efficiency = <1024>;
 			next-level-cache = <&L2_0>;
 			qcom,ea = <&ea0>;
@@ -82,6 +83,7 @@
 			qcom,limits-info = <&mitigation_profile1>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			enable-method = "psci";
+			#cooling-cells = <2>;
 			efficiency = <1024>;
 			next-level-cache = <&L2_0>;
 			qcom,ea = <&ea1>;
@@ -106,6 +108,7 @@
 			qcom,limits-info = <&mitigation_profile2>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			enable-method = "psci";
+			#cooling-cells = <2>;
 			efficiency = <1024>;
 			next-level-cache = <&L2_0>;
 			qcom,ea = <&ea2>;
@@ -130,6 +133,7 @@
 			qcom,limits-info = <&mitigation_profile3>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			enable-method = "psci";
+			#cooling-cells = <2>;
 			efficiency = <1024>;
 			next-level-cache = <&L2_0>;
 			qcom,ea = <&ea3>;
