@@ -1,0 +1,3 @@
+[submodule "azure-clangg"]
+	path = azure-clangg
+	url = https://github.com/fazrul1994/azure-clang
