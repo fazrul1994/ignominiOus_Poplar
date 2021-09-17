@@ -9766,7 +9766,7 @@ static int hdd_parse_action_oui(hdd_context_t *hdd_ctx, uint8_t *oui_string,
 			hdd_err("Invalid spaces in action oui: %u at extension: %u for token: %s",
 				action_id,
 				oui_index + 1,
-				hdd_action_type_to_string(action_token));
+				hdd_action_oui_token_string(action_token));
 			valid = false;
 			break;
 		}
@@ -9774,7 +9774,7 @@ static int hdd_parse_action_oui(hdd_context_t *hdd_ctx, uint8_t *oui_string,
 		token = strsep(&str2, " ");
 		if (!token) {
 			hdd_err("Invalid string for token: %s at extension: %u in action oui: %u",
-				hdd_action_type_to_string(action_token),
+				hdd_action_oui_token_string(action_token),
 				oui_index + 1, action_id);
 			valid = false;
 			break;
@@ -9837,7 +9837,7 @@ static int hdd_parse_action_oui(hdd_context_t *hdd_ctx, uint8_t *oui_string,
 
 		if (!valid) {
 			hdd_err("Invalid string for token: %s at extension: %u in action oui: %u",
-				hdd_action_type_to_string(action_token),
+				hdd_action_oui_token_string(action_token),
 				oui_index + 1,
 				action_id);
 			break;
@@ -9876,7 +9876,7 @@ static int hdd_parse_action_oui(hdd_context_t *hdd_ctx, uint8_t *oui_string,
 	    action_token != HDD_ACTION_OUI_END_TOKEN &&
 	    valid && !str1) {
 		hdd_err("No string for token: %s at extension: %u in action oui: %u",
-			hdd_action_type_to_string(action_token),
+			hdd_action_oui_token_string(action_token),
 			oui_index + 1,
 			action_id);
 		valid = false;
