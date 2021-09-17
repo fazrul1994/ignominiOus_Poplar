@@ -90,6 +90,7 @@ typedef int (qdf_abstract_print)(void *priv, const char *fmt, ...);
 #else
 #define MTRACE(p)
 
+#else
 #define MTRACE(p) {  }
 #endif
 
