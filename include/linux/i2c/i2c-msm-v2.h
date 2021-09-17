@@ -19,8 +19,6 @@
 
 #include <linux/bitops.h>
 #include <linux/dmaengine.h>
-#include <linux/dma-direction.h>
-#include <linux/i2c.h>
 
 enum msm_i2_debug_level {
 	MSM_ERR,	/* Error messages only. Always on */
