@@ -156,7 +156,7 @@ int kgsl_add_fence_event(struct kgsl_device *device,
 	struct sync_pt *pt;
 	struct sync_fence *fence = NULL;
 	int ret = -EINVAL;
-	char fence_name[sizeof(fence->name)] = {};
+	char fence_name[sizeof(fence)] = {};
 	unsigned int cur;
 
 	priv.fence_fd = -1;
