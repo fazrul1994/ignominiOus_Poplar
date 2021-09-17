@@ -3242,9 +3242,7 @@ static int mdss_mdp_cmd_kickoff(struct mdss_mdp_ctl *ctl, void *arg)
 		else if (ctx->lineptr_enabled)
 			mdss_mdp_cmd_lineptr_ctrl(ctl, false);
 	}
-
-<<<<<<< HEAD
-=======
+	
 	clearbit = BIT(24 + ctx->current_pp_num);
 	if (sctx)
 		clearbit |= BIT(24 + sctx->current_pp_num);
@@ -3257,7 +3255,6 @@ static int mdss_mdp_cmd_kickoff(struct mdss_mdp_ctl *ctl, void *arg)
 		pm_qos_update_request(&mdata->pm_irq_req, 100);
 	WRITE_ONCE(mdata->pm_irq_set, true);
 
->>>>>>> 574e173748b1... msm: mdss: Speed up MDP interrupt processing for cmd mode panels
 	/* Kickoff */
 	__mdss_mdp_kickoff(ctl, sctl, ctx);
 
