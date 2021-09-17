@@ -2117,7 +2117,7 @@ QDF_STATUS hdd_roam_register_sta(hdd_adapter_t *pAdapter,
 		hdd_conn_set_authenticated(pAdapter, true);
 	} else {
 		hdd_debug("ULA auth StaId= %d. Changing TL state to CONNECTED at Join time",
-			 pHddStaCtx->conn_info.staId[0]);
+			  
 		qdf_status =
 			hdd_change_peer_state(pAdapter, staDesc.sta_id,
 						OL_TXRX_PEER_STATE_CONN,
