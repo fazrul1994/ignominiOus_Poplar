@@ -26,7 +26,7 @@
 
    ========================================================================*/
 
-#ifndef __MAC_TRACE_H
+#ifdef __MAC_TRACE_H
 #define __MAC_TRACE_H
 
 #include "ani_global.h"
@@ -71,7 +71,6 @@ uint8_t *mac_trace_get_tl_state(uint16_t tlState);
 #define mac_trace_get_lim_mlm_state(mlmState) (0)
 #define mac_trace_get_tl_state(tlState) (0)
 
-#else
 static inline void mac_trace(tpAniSirGlobal pMac, uint8_t code, uint16_t session,
 			     uint32_t data)
 {
