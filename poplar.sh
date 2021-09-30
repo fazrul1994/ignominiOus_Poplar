@@ -3,7 +3,7 @@
 	BUILD_START=$(date +"%s")
 	
 	neofetch
-	echo Reload Compiler pacman-clang Tool | lolcat
+	echo Reload Compiler | lolcat
 	echo by fazrul Not Dev.... | lolcat
 	toilet Are you Ready...???? | lolcat
 	
