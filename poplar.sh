@@ -19,9 +19,9 @@
     export USE_CCACHE=1
     export CROSS_COMPILE="ccache aarch64-linux-gnu-"
     export CROSS_COMPILE_ARM32="ccache arm-linux-gnueabi-"
-    export CLANG_PATH=/root/pacman-clang
+    export CLANG_PATH=/root/braindrill
     
-    time make ignominiOus-poplaR_defconfig O=out
+    time make ignominiOus-RR_defconfig O=out
     time make menuconfig O=out
     
     figlet tinggal tunggu sambil ngopi | lolcat
