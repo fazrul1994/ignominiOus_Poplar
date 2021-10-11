@@ -21,7 +21,7 @@
     export CROSS_COMPILE_ARM32="ccache arm-linux-gnueabi-"
     export CLANG_PATH=/root/braindrill
     
-    time make ignominiOus-RR_defconfig O=out
+    time make ignominiOusRR-WD_defconfig O=out
     time make menuconfig O=out
     
     figlet tinggal tunggu sambil ngopi | lolcat
