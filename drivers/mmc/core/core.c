@@ -3044,6 +3044,7 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 	 */
 	mmc_host_clk_hold(host);
 	err = mmc_wait_for_cmd(host, &cmd, 0);
+
 	if (err) {
 		if (err == -ETIMEDOUT) {
 			pr_debug("%s: voltage switching failed with err %d\n",

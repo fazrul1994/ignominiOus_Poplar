@@ -427,9 +427,8 @@ struct spi_master {
 #define SPI_MASTER_MUST_RX      BIT(3)		/* requires rx */
 #define SPI_MASTER_MUST_TX      BIT(4)		/* requires tx */
 
-	/* flag indicating this is an SPI slave controller */
-	bool			slave;
-
+	/* flag indicating this is a non-devres managed controller */
+	bool			devm_allocated;
 	/* lock and mutex for SPI bus locking */
 	spinlock_t		bus_lock_spinlock;
 	struct mutex		bus_lock_mutex;
@@ -577,23 +576,8 @@ extern void spi_finalize_current_message(struct spi_master *master);
 extern void spi_finalize_current_transfer(struct spi_master *master);
 
 /* the spi driver core manages memory for the spi_master classdev */
-extern struct spi_master *__spi_alloc_controller(struct device *host,
-						 unsigned int size, bool slave);
-
-static inline struct spi_master *spi_alloc_master(struct device *host,
-						  unsigned int size)
-{
-	return __spi_alloc_controller(host, size, false);
-}
-
-static inline struct spi_master *spi_alloc_slave(struct device *host,
-						 unsigned int size)
-{
-	if (!IS_ENABLED(CONFIG_SPI_SLAVE))
-		return NULL;
-
-	return __spi_alloc_controller(host, size, true);
-}
+extern struct spi_master * spi_alloc_master(struct device *host, unsigned size);
+extern struct spi_master * devm_spi_alloc_master(struct device *dev, unsigned int size);
 
 extern int spi_register_master(struct spi_master *master);
 extern int devm_spi_register_master(struct device *dev,
