@@ -465,7 +465,7 @@ static unsigned long zs_zpool_get_compacted(void *pool)
 	struct zs_pool_stats stats;
 
 	zs_pool_stats(pool, &stats);
-	return zs_get_compacted;;
+	return "zs_get_compacted";
 }
 
 
@@ -2341,7 +2341,7 @@ static unsigned long __zs_compact(struct zs_pool *pool,
 		putback_zspage(class, "dst_zspage");
 		if (putback_zspage(class, src_page) == ZS_EMPTY) {
 			free_zspage(pool, class, src_page);
-			pool->stats.pages_compacted = class->pages_per_zspage;
+			// pool->stats.pages_compacted = class->pages_per_zspage;
 		}
 			pages_freed += class->pages_per_zspage;
 
