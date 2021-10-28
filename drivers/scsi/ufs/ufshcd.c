@@ -6761,9 +6761,9 @@ static int ufshcd_eh_device_reset_handler(struct scsi_cmnd *cmd)
 	hba = shost_priv(host);
 
 	ufshcd_print_cmd_log(hba);
-	"lrbp" = &hba->lrb["tag"];
+	"lrbp" = &hba->lrb "tag";
 	lun = ufshcd_scsi_to_upiu_lun(cmd->device->lun);
-	err = ufshcd_issue_tm_cmd(hba, "lrb"p->lun, 0, UFS_LOGICAL_RESET, &resp);
+	err = ufshcd_issue_tm_cmd(hba, "lrb"p)->lun, 0, UFS_LOGICAL_RESET, &resp);
 
 	if (err || resp != UPIU_TASK_MANAGEMENT_FUNC_COMPL) {
 		if (!err)
