@@ -1506,7 +1506,7 @@ EXPORT_SYMBOL_GPL(rt_mutex_lock_interruptible);
  */
 int __sched rt_mutex_futex_trylock(struct rt_mutex *lock)
 
- * Futex variant with full deadlock detection.
+ /* Futex variant with full deadlock detection.
  * Futex variants must not use the fast-path, see __rt_mutex_futex_unlock().
  */
 int __sched rt_mutex_timed_futex_lock(struct rt_mutex *lock,
