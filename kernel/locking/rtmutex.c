@@ -1349,8 +1349,11 @@ static bool __sched rt_mutex_slowunlock(struct rt_mutex *lock,
 	/* irqsave required to support early boot calls */
 	raw_spin_lock_irqsave(&lock->wait_lock, flags);
 
+ 
 	debug_rt_mutex_unlock(lock);
 
+
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 	/*
 	 * We must be careful here if the fast path is enabled. If we
 	 * have no waiters queued we cannot set owner to NULL here
@@ -1498,6 +1501,28 @@ int __sched rt_mutex_lock_interruptible(struct rt_mutex *lock)
 EXPORT_SYMBOL_GPL(rt_mutex_lock_interruptible);
 
 /*
+ 
+ * Futex variant, must not use fastpath.
+ */
+int __sched rt_mutex_futex_trylock(struct rt_mutex *lock)
+
+ * Futex variant with full deadlock detection.
+ * Futex variants must not use the fast-path, see __rt_mutex_futex_unlock().
+ */
+int __sched rt_mutex_timed_futex_lock(struct rt_mutex *lock,
+			      struct hrtimer_sleeper *timeout)
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
+{
+	return rt_mutex_slowtrylock(lock);
+}
+
+ 
+
+	return rt_mutex_slowlock(lock, TASK_INTERRUPTIBLE,
+				 timeout, RT_MUTEX_FULL_CHAINWALK);
+}
+
+/*
  * Futex variant, must not use fastpath.
  */
 int __sched rt_mutex_futex_trylock(struct rt_mutex *lock)
@@ -1505,6 +1530,7 @@ int __sched rt_mutex_futex_trylock(struct rt_mutex *lock)
 	return rt_mutex_slowtrylock(lock);
 }
 
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 int __sched __rt_mutex_futex_trylock(struct rt_mutex *lock)
 {
 	return __rt_mutex_slowtrylock(lock);

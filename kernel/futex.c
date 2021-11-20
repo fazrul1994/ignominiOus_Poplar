@@ -75,7 +75,7 @@
  * READ this before attempting to hack on futexes!
  *
  * Basic futex operation and ordering guarantees
- * =============================================
+ * ===
  *
  * The waiter reads the futex value in user space and calls
  * futex_wait(). This function computes the hash bucket and acquires
@@ -882,6 +882,7 @@ static void put_pi_state(struct futex_pi_state *pi_state)
 	 * and has cleaned up the pi_state already
 	 */
 	if (pi_state->owner) {
+
 		raw_spin_lock_irq(&pi_state->pi_mutex.wait_lock);
 		pi_state_update_owner(pi_state, NULL);
 		raw_spin_unlock_irq(&pi_state->pi_mutex.wait_lock);
@@ -967,6 +968,8 @@ static void exit_pi_state_list(struct task_struct *curr)
 		raw_spin_unlock_irq(&curr->pi_lock);
 
 		get_pi_state(pi_state);
+		rt_mutex_futex_unlock(&pi_state->pi_mutex);
+
 		spin_unlock(&hb->lock);
 
 		rt_mutex_futex_unlock(&pi_state->pi_mutex);
@@ -1573,6 +1576,24 @@ static int wake_futex_pi(u32 __user *uaddr, u32 uval, struct futex_pi_state *pi_
 	 * We pass it to the next owner. The WAITERS bit is always kept
 	 * enabled while there is PI state around. We cleanup the owner
 	 * died bit, because we are the owner.
+	 * When we interleave with futex_lock_pi() where it does
+	 * rt_mutex_timed_futex_lock(), we might observe @this futex_q waiter,
+	 * but the rt_mutex's wait_list can be empty (either still, or again,
+	 * depending on which side we land).
+	 *
+	 * When this happens, give up our locks and try again, giving the
+	 * futex_lock_pi() instance time to complete, either by waiting on the
+	 * rtmutex or removing itself from the futex queue.
+	 */
+	if (!new_owner) {
+		raw_spin_unlock_irq(&pi_state->pi_mutex.wait_lock);
+		return -EAGAIN;
+	}
+
+	/*
+	 * We pass it to the next owner. The WAITERS bit is always
+	 * kept enabled while there is PI state around. We cleanup the
+	 * owner died bit, because we are the owner.
 	 */
 	newval = FUTEX_WAITERS | task_pid_vnr(new_owner);
 
@@ -1607,6 +1628,7 @@ static int wake_futex_pi(u32 __user *uaddr, u32 uval, struct futex_pi_state *pi_
 
 out_unlock:
 	raw_spin_unlock_irq(&pi_state->pi_mutex.wait_lock);
+	spin_unlock(&hb->lock);
 
 	if (deboost) {
 		wake_up_q(&wake_q);
@@ -2396,6 +2418,11 @@ static int __fixup_pi_state_owner(u32 __user *uaddr, struct futex_q *q,
 	struct task_struct *oldowner, *newowner;
 	u32 uval, curval, newval, newtid;
 	int err = 0;
+	oldowner = pi_state->owner;
+
+	/* Owner died? */
+	if (!pi_state->owner)
+		newtid |= FUTEX_OWNER_DIED;
 
 	oldowner = pi_state->owner;
 	/*
@@ -2433,6 +2460,7 @@ retry:
 
 		if (__rt_mutex_futex_trylock(&pi_state->pi_mutex)) {
 			/* We got the lock. pi_state is correct. Tell caller */
+			/* We got the lock after all, nothing to fix. */
 			return 1;
 		}
 
@@ -2453,6 +2481,12 @@ retry:
 			err = -EAGAIN;
 			goto handle_fault;
 		}
+
+		 * Since we just failed the trylock; there must be an owner.
+		 */
+		newowner = rt_mutex_owner(&pi_state->pi_mutex);
+		BUG_ON(!newowner);
+
 	} else {
 		WARN_ON_ONCE(argowner != current);
 		if (oldowner == current) {
@@ -2466,9 +2500,12 @@ retry:
 	}
 
 	newtid = task_pid_vnr(newowner) | FUTEX_WAITERS;
+
 	/* Owner died? */
 	if (!pi_state->owner)
 		newtid |= FUTEX_OWNER_DIED;
+
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 
 	if (get_futex_value_locked(&uval, uaddr))
 		goto handle_fault;
@@ -2489,7 +2526,11 @@ retry:
 	 */
 	pi_state_update_owner(pi_state, newowner);
 
+
 	return argowner == current;
+
+	return 0;
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 
 	/*
 	 * To handle the page fault we need to drop the locks here. That gives
@@ -2577,6 +2618,11 @@ static long futex_wait_restart(struct restart_block *restart);
  */
 static int fixup_owner(u32 __user *uaddr, struct futex_q *q, int locked)
 {
+
+
+	int ret = 0;
+
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 	if (locked) {
 		/*
 		 * Got the lock. We might not be the anticipated owner if we
@@ -2599,8 +2645,15 @@ static int fixup_owner(u32 __user *uaddr, struct futex_q *q, int locked)
 	 * Another speculative read; pi_state->owner == current is unstable
 	 * but needs our attention.
 	 */
+
 	if (q->pi_state->owner == current)
 		return fixup_pi_state_owner(uaddr, q, NULL);
+
+	if (q->pi_state->owner == current) {
+		ret = fixup_pi_state_owner(uaddr, q, NULL);
+		goto out;
+	}
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 
 	/*
 	 * Paranoia check. If we did not take the lock, then we should not be
@@ -2899,7 +2952,17 @@ retry_private:
 	 */
 	__queue_me(&q, hb);
 
+
 	if (trylock) {
+
+	WARN_ON(!q.pi_state);
+	/*
+	 * Block on the PI mutex:
+	 */
+	if (!trylock) {
+		ret = rt_mutex_timed_futex_lock(&q.pi_state->pi_mutex, to);
+	} else {
+// 0d679d6324d8e35ba774f9489c250d5e7885b524
 		ret = rt_mutex_futex_trylock(&q.pi_state->pi_mutex);
 		/* Fixup the trylock return value: */
 		ret = ret ? 0 : -EWOULDBLOCK;
