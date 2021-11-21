@@ -1463,7 +1463,6 @@ static int futex_lock_pi_atomic(u32 __user *uaddr, struct futex_hash_bucket *hb,
 	 * No waiter and user TID is 0. We are here because the
 	 * waiters or the owner died bit is set or called from
 	 * requeue_cmp_pi or for whatever reason something took the
-	 * syscall.
 	 */
 	if (!(uval & FUTEX_TID_MASK)) {
 		/*
@@ -1628,7 +1627,7 @@ static int wake_futex_pi(u32 __user *uaddr, u32 uval, struct futex_pi_state *pi_
 
 out_unlock:
 	raw_spin_unlock_irq(&pi_state->pi_mutex.wait_lock);
-	spin_unlock(&hb->lock);
+	spin_unlock(&pi_state->lock);
 
 	if (deboost) {
 		wake_up_q(&wake_q);
@@ -2482,7 +2481,7 @@ retry:
 			goto handle_fault;
 		}
 
-		 * Since we just failed the trylock; there must be an owner.
+		 /* Since we just failed the trylock; there must be an owner.
 		 */
 		newowner = rt_mutex_owner(&pi_state->pi_mutex);
 		BUG_ON(!newowner);
@@ -3049,7 +3048,7 @@ uaddr_faulted:
  * and do the rt-mutex unlock.
  */
 static int futex_unlock_pi(u32 __user *uaddr, unsigned int flags)
-{
+
 	u32 uninitialized_var(curval), uval, vpid = task_pid_vnr(current);
 	union futex_key key = FUTEX_KEY_INIT;
 	struct futex_hash_bucket *hb;
@@ -3189,7 +3188,7 @@ static inline
 int handle_early_requeue_pi_wakeup(struct futex_hash_bucket *hb,
 				   struct futex_q *q, union futex_key *key2,
 				   struct hrtimer_sleeper *timeout)
-{
+
 	int ret = 0;
 
 	/*
@@ -3261,7 +3260,7 @@ int handle_early_requeue_pi_wakeup(struct futex_hash_bucket *hb,
 static int futex_wait_requeue_pi(u32 __user *uaddr, unsigned int flags,
 				 u32 val, ktime_t *abs_time, u32 bitset,
 				 u32 __user *uaddr2)
-{
+
 	struct hrtimer_sleeper timeout, *to = NULL;
 	struct rt_mutex_waiter rt_waiter;
 	struct futex_hash_bucket *hb;
@@ -3433,9 +3432,9 @@ out:
  * @head:	pointer to the list-head
  * @len:	length of the list-head, as userspace expects
  */
-SYSCALL_DEFINE2(set_robust_list, struct robust_list_head __user *, head,
+#define SYSCALL_DEFINE2(set_robust_list, struct robust_list_head __user *, head,
 		size_t, len)
-{
+
 	if (!futex_cmpxchg_enabled)
 		return -ENOSYS;
 	/*
@@ -3458,7 +3457,7 @@ SYSCALL_DEFINE2(set_robust_list, struct robust_list_head __user *, head,
 SYSCALL_DEFINE3(get_robust_list, int, pid,
 		struct robust_list_head __user * __user *, head_ptr,
 		size_t __user *, len_ptr)
-{
+
 	struct robust_list_head __user *head;
 	unsigned long ret;
 	struct task_struct *p;
@@ -3499,7 +3498,7 @@ err_unlock:
  * dying task, and do notification if so:
  */
 static int handle_futex_death(u32 __user *uaddr, struct task_struct *curr, int pi)
-{
+
 	u32 uval, uninitialized_var(nval), mval;
 
 	/* Futex address must be 32bit aligned */
@@ -3555,7 +3554,7 @@ retry:
 static inline int fetch_robust_entry(struct robust_list __user **entry,
 				     struct robust_list __user * __user *head,
 				     unsigned int *pi)
-{
+
 	unsigned long uentry;
 
 	if (get_user(uentry, (unsigned long __user *)head))
@@ -3574,7 +3573,7 @@ static inline int fetch_robust_entry(struct robust_list __user **entry,
  * We silently return on any sign of list-walking problem.
  */
 static void exit_robust_list(struct task_struct *curr)
-{
+
 	struct robust_list_head __user *head = curr->robust_list;
 	struct robust_list __user *entry, *next_entry, *pending;
 	unsigned int limit = ROBUST_LIST_LIMIT, pi, pip;
@@ -3637,7 +3636,7 @@ static void exit_robust_list(struct task_struct *curr)
 }
 
 static void futex_cleanup(struct task_struct *tsk)
-{
+
 	if (unlikely(tsk->robust_list)) {
 		exit_robust_list(tsk);
 		tsk->robust_list = NULL;
